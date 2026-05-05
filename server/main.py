@@ -5,6 +5,8 @@ import os
 
 load_dotenv()
 
+from routers import analyze
+
 app = FastAPI(title="CV Analyzer API", version="1.0.0")
 
 app.add_middleware(
@@ -13,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(analyze.router, prefix="/api")
 
 @app.get("/api/health")
 def health():
