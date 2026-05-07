@@ -1,11 +1,15 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from typing import Optional
 from services import pdf, llm
 
 router = APIRouter()
 
 
 @router.post("/analyze")
-async def analyze_cv(file: UploadFile = File(...)):
+async def analyze_cv(
+    file: UploadFile = File(...),
+    job_description: Optional[str] = Form(None),
+):
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
 
@@ -17,7 +21,7 @@ async def analyze_cv(file: UploadFile = File(...)):
         )
 
     try:
-        result = llm.analyze(cv_text)
+        result = llm.analyze(cv_text, job_description or None)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
